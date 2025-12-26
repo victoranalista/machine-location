@@ -21,12 +21,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function MachinePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const machine = await getMachineById(params.id);
+  const { id } = await params;
+  const machine = await getMachineById(id);
 
   if (!machine) {
     notFound();
