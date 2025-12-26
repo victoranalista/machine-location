@@ -80,7 +80,7 @@ export const machines: Machine[] = [
     state: "MG",
     power: "155 HP",
     weight: "6.800 kg",
-    description: "Trator agrícola de alta potência, ideal para preparo de solo, plantio e colheita. Equipamento seminovo com baixa horàmetro.",
+    description: "Trator agrícola de alta potência, ideal para preparo de solo, plantio e colheita. Equipamento seminovo com baixo horímetro.",
     features: [
       "Transmissão automática",
       "Sistema hidráulico de precisão",
