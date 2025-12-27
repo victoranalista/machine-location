@@ -1,0 +1,5 @@
+#!/bin/sh
+export PATH="./node_modules/.bin:$PATH"
+. "$(dirname "$0")/_/husky.sh"
+
+pnpm exec lint-staged
