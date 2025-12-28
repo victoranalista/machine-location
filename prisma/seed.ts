@@ -4,8 +4,6 @@ const prisma = new PrismaClient();
 
 const main = async () => {
   console.log('🌱 Iniciando seed do banco de dados...');
-
-  // Limpar dados existentes
   await prisma.cartItem.deleteMany();
   await prisma.review.deleteMany();
   await prisma.favorite.deleteMany();
@@ -16,10 +14,18 @@ const main = async () => {
   await prisma.category.deleteMany();
   await prisma.brand.deleteMany();
   await prisma.location.deleteMany();
-
   console.log('✅ Dados antigos removidos');
-
-  // Criar Categorias
+  const fornecedor = await prisma.user.upsert({
+    where: { email: 'fornecedor@example.com' },
+    update: {},
+    create: {
+      email: 'fornecedor@example.com',
+      name: 'Fornecedor Demo',
+      role: 'FORNECEDOR',
+      password: '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'
+    }
+  });
+  console.log('✅ Usuário fornecedor criado');
   const categories = await Promise.all([
     prisma.category.create({
       data: {
@@ -92,6 +98,42 @@ const main = async () => {
         imageUrl:
           'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'
       }
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Empilhadeiras',
+        slug: 'empilhadeiras',
+        description: 'Empilhadeiras elétricas e a combustão',
+        imageUrl:
+          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'
+      }
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Minicarregadeiras',
+        slug: 'minicarregadeiras',
+        description: 'Minicarregadeiras compactas Bobcat e similares',
+        imageUrl:
+          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'
+      }
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Pás Carregadeiras',
+        slug: 'pas-carregadeiras',
+        description: 'Pás carregadeiras para movimentação de materiais',
+        imageUrl:
+          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'
+      }
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Motoniveladoras',
+        slug: 'motoniveladoras',
+        description: 'Motoniveladoras para nivelamento de terrenos',
+        imageUrl:
+          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'
+      }
     })
   ]);
 
@@ -113,7 +155,21 @@ const main = async () => {
     prisma.brand.create({ data: { name: 'Case', slug: 'case' } }),
     prisma.brand.create({ data: { name: 'JCB', slug: 'jcb' } }),
     prisma.brand.create({ data: { name: 'Liebherr', slug: 'liebherr' } }),
-    prisma.brand.create({ data: { name: 'New Holland', slug: 'new-holland' } })
+    prisma.brand.create({ data: { name: 'New Holland', slug: 'new-holland' } }),
+    prisma.brand.create({ data: { name: 'Hyundai', slug: 'hyundai' } }),
+    prisma.brand.create({ data: { name: 'Doosan', slug: 'doosan' } }),
+    prisma.brand.create({ data: { name: 'Hitachi', slug: 'hitachi' } }),
+    prisma.brand.create({ data: { name: 'XCMG', slug: 'xcmg' } }),
+    prisma.brand.create({ data: { name: 'Sany', slug: 'sany' } }),
+    prisma.brand.create({ data: { name: 'LiuGong', slug: 'liugong' } }),
+    prisma.brand.create({ data: { name: 'Terex', slug: 'terex' } }),
+    prisma.brand.create({ data: { name: 'Bobcat', slug: 'bobcat' } }),
+    prisma.brand.create({
+      data: { name: 'Massey Ferguson', slug: 'massey-ferguson' }
+    }),
+    prisma.brand.create({ data: { name: 'Valtra', slug: 'valtra' } }),
+    prisma.brand.create({ data: { name: 'Agrale', slug: 'agrale' } }),
+    prisma.brand.create({ data: { name: 'Randon', slug: 'randon' } })
   ]);
 
   console.log(`✅ ${brands.length} marcas criadas`);
@@ -374,44 +430,52 @@ const main = async () => {
           dailyRate: data.dailyRate,
           weeklyRate: data.weeklyRate,
           monthlyRate: data.monthlyRate,
-          status: data.status as
-            | 'AVAILABLE'
-            | 'RENTED'
-            | 'MAINTENANCE'
-            | 'RETIRED'
+          status: 'AVAILABLE',
+          ownerId: fornecedor.id
         }
       })
     )
   );
 
   console.log(`✅ ${equipment.length} equipamentos criados`);
-
-  // Criar especificações para o primeiro equipamento
+  if (equipment.length === 0) {
+    console.log('⚠️  Nenhum equipamento criado, pulando especificações');
+    return;
+  }
+  const firstEquipment = equipment[0];
+  if (!firstEquipment) {
+    console.log('⚠️  Primeiro equipamento não encontrado');
+    return;
+  }
   await prisma.equipmentSpec.createMany({
     data: [
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         name: 'Peso Operacional',
         value: '22.000 kg'
       },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         name: 'Potência do Motor',
         value: '162 hp'
       },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         name: 'Capacidade da Caçamba',
         value: '1,2 m³'
       },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         name: 'Profundidade Máx. de Escavação',
         value: '6,7 m'
       },
-      { equipmentId: equipment[0].id, name: 'Alcance Máximo', value: '9,9 m' },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
+        name: 'Alcance Máximo',
+        value: '9,9 m'
+      },
+      {
+        equipmentId: firstEquipment.id,
         name: 'Consumo de Combustível',
         value: '15 L/h'
       }
@@ -419,22 +483,20 @@ const main = async () => {
   });
 
   console.log('✅ Especificações criadas para o primeiro equipamento');
-
-  // Criar imagens adicionais
   await prisma.equipmentImage.createMany({
     data: [
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         url: 'https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=800',
         order: 1
       },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
         order: 2
       },
       {
-        equipmentId: equipment[0].id,
+        equipmentId: firstEquipment.id,
         url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800',
         order: 3
       }

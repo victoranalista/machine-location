@@ -95,22 +95,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const parsedUrl = new URL(url, baseUrl);
         const callbackUrl = parsedUrl.searchParams.get('callbackUrl');
         if (callbackUrl && callbackUrl.startsWith(baseUrl)) return callbackUrl;
-        else if (parsedUrl.pathname === '/login') return baseUrl + '/dashboard';
+        else if (parsedUrl.pathname === '/login') return baseUrl;
       } catch (error) {
         console.error('Error parsing URL in callback redirect:', error);
       }
       if (url.startsWith(baseUrl)) return url;
-      return `${baseUrl}/dashboard`;
+      return baseUrl;
     },
     authorized: ({ request, auth }) => {
-      if (!!auth === false) return !!auth;
+      if (!auth?.user) return false;
       const pathname = request.nextUrl.pathname;
-      if (pathname.startsWith('/settings')) {
-        if (auth.user.role !== 'ADMIN') {
-          const url = request.nextUrl.clone();
-          url.pathname = '/dashboard/unauthorized';
-          return NextResponse.redirect(url);
-        }
+      const userRole = auth.user.role;
+      if (pathname.startsWith('/admin') && userRole !== 'ADMIN') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login/unauthorized';
+        return NextResponse.redirect(url);
+      }
+      if (
+        pathname.startsWith('/fornecedor') &&
+        userRole !== 'SUPPLIER' &&
+        userRole !== 'ADMIN'
+      ) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login/unauthorized';
+        return NextResponse.redirect(url);
+      }
+      if (pathname.startsWith('/settings') && userRole !== 'ADMIN') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login/unauthorized';
+        return NextResponse.redirect(url);
       }
       return true;
     }

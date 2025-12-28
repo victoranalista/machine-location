@@ -23,7 +23,17 @@ const privateLimiter = createRateLimiter();
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicRoute = false;
+  const protectedRoutes = [
+    '/admin',
+    '/fornecedor',
+    '/carrinho/checkout',
+    '/settings',
+    '/minha-conta'
+  ];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isPublicRoute = !isProtectedRoute;
   const isUploadRoute = pathname.startsWith('/file/upload');
   const rateLimitResponse = await rateLimitMiddleware(
     request,
@@ -31,7 +41,8 @@ export default async function proxy(request: NextRequest) {
     isUploadRoute
   );
   if (rateLimitResponse) return rateLimitResponse;
-  return auth(request as any);
+  if (isProtectedRoute) return auth(request as any);
+  return NextResponse.next();
 }
 
 const rateLimitMiddleware = async (

@@ -11,7 +11,8 @@ import {
   FileText,
   Settings,
   ChevronLeft,
-  HardHat
+  HardHat,
+  CheckSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -19,6 +20,7 @@ import { useState } from 'react';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Aprovações', href: '/admin/aprovacoes', icon: CheckSquare },
   { label: 'Equipamentos', href: '/admin/equipamentos', icon: Package },
   { label: 'Categorias', href: '/admin/categorias', icon: FolderTree },
   { label: 'Locações', href: '/admin/locacoes', icon: FileText },

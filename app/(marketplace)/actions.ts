@@ -44,7 +44,10 @@ export type EquipmentFilters = {
 };
 
 const buildWhereClause = (filters: EquipmentFilters) => {
-  const where: Record<string, unknown> = { status: EquipmentStatus.AVAILABLE };
+  const where: Record<string, unknown> = {
+    status: EquipmentStatus.AVAILABLE,
+    isApproved: true
+  };
   if (filters.categorySlug) where.category = { slug: filters.categorySlug };
   if (filters.brandSlug) where.brand = { slug: filters.brandSlug };
   if (filters.city)

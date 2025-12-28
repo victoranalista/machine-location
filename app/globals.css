@@ -38,6 +38,59 @@
   .scrollbar-auto-hide:hover::-webkit-scrollbar-thumb {
     background: hsl(var(--muted-foreground) / 0.35);
   }
+  .bg-grid-primary {
+    background-image: linear-gradient(
+        to right,
+        hsl(var(--primary) / 0.1) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--primary) / 0.1) 1px,
+        transparent 1px
+      );
+    background-size: 40px 40px;
+  }
+  .animate-in {
+    animation-fill-mode: both;
+  }
+  .fade-in {
+    animation-name: fadeIn;
+  }
+  .slide-in-from-bottom-4 {
+    animation-name: slideInFromBottom4;
+  }
+  .slide-in-from-bottom-6 {
+    animation-name: slideInFromBottom6;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slideInFromBottom4 {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideInFromBottom6 {
+    from {
+      opacity: 0;
+      transform: translateY(1.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 :root {

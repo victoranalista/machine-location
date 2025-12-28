@@ -5,13 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 const HeaderSearch = () => {
   const [open, setOpen] = useState(false);
@@ -25,29 +18,37 @@ const HeaderSearch = () => {
       setSearch('');
     }
   };
+  const handleClose = () => {
+    setOpen(false);
+    setSearch('');
+  };
+  if (!open) {
+    return (
+      <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+        <Search className="h-5 w-5" />
+      </Button>
+    );
+  }
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Search className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
-        <VisuallyHidden>
-          <DialogTitle>Buscar equipamentos</DialogTitle>
-        </VisuallyHidden>
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
-            placeholder="Buscar escavadeiras, tratores, guindastes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1"
-            autoFocus
-          />
-          <Button type="submit">Buscar</Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <form
+      onSubmit={handleSearch}
+      className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200"
+    >
+      <Input
+        type="text"
+        placeholder="Buscar equipamentos..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="h-9 w-48 sm:w-64"
+        autoFocus
+      />
+      <Button type="submit" size="sm">
+        <Search className="h-4 w-4" />
+      </Button>
+      <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
+        <X className="h-4 w-4" />
+      </Button>
+    </form>
   );
 };
 

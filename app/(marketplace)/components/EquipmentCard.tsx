@@ -2,36 +2,32 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { EquipmentCard } from '../actions';
+import { formatCurrency } from '@/lib/validators';
 
 type EquipmentCardProps = {
   equipment: EquipmentCard;
 };
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-    value
-  );
-
 const EquipmentCardComponent = ({ equipment }: EquipmentCardProps) => (
   <Link href={`/equipamentos/${equipment.slug}`}>
-    <Card className="group h-full overflow-hidden transition-all hover:shadow-lg">
+    <Card className="group h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {equipment.mainImageUrl ? (
           <Image
             src={equipment.mainImageUrl}
             alt={equipment.name}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-muted-foreground">Sem imagem</span>
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <span className="text-sm text-muted-foreground">Sem imagem</span>
           </div>
         )}
         {equipment.featured && (
-          <Badge className="absolute left-3 top-3">Destaque</Badge>
+          <Badge className="absolute left-3 top-3 shadow-lg">Destaque</Badge>
         )}
       </div>
       <CardContent className="p-4">
@@ -45,7 +41,7 @@ const EquipmentCardComponent = ({ equipment }: EquipmentCardProps) => (
             </span>
           )}
         </div>
-        <h3 className="mb-2 line-clamp-2 font-semibold leading-tight group-hover:text-primary">
+        <h3 className="mb-2 line-clamp-2 font-semibold leading-tight transition-colors group-hover:text-primary">
           {equipment.name}
         </h3>
         {equipment.shortDescription && (
@@ -61,7 +57,7 @@ const EquipmentCardComponent = ({ equipment }: EquipmentCardProps) => (
             </span>
           </div>
         )}
-        <div className="flex items-end justify-between">
+        <div className="flex items-end justify-between border-t pt-3">
           <div>
             <p className="text-lg font-bold">
               {formatCurrency(equipment.dailyRate)}
