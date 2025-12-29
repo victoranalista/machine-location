@@ -7,12 +7,13 @@ import bcrypt from 'bcryptjs';
 
 const prisma = prismaNeon;
 
-type Role = 'ADMIN' | 'USER';
-const VALID_ROLES: Role[] = ['ADMIN', 'USER'];
+type Role = 'ADMIN' | 'USER' | 'SUPPLIER';
+const VALID_ROLES: Role[] = ['ADMIN', 'USER', 'SUPPLIER'];
 
 export const sessionMaxAge = 24 * 60 * 60;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: sessionMaxAge,
