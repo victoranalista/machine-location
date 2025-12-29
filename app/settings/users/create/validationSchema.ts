@@ -1,13 +1,10 @@
-import { validatetaxpayerId } from '@/lib/validators';
+import { validatedocument } from '@/lib/validators';
 import { z } from 'zod';
 import { UserFormValues } from '../types';
-import { Role, ActivationStatus } from '@/lib/enums';
+import { Role, UserStatus } from '@/lib/enums';
 
 const RoleEnum = [Role.ADMIN, Role.USER] as const;
-const StatusEnum = [
-  ActivationStatus.ACTIVE,
-  ActivationStatus.INACTIVE
-] as const;
+const StatusEnum = [UserStatus.ACTIVE, UserStatus.INACTIVE] as const;
 
 export const validationSchema = z
   .object({
@@ -26,32 +23,32 @@ export const validationSchema = z
     status: z.enum(StatusEnum, {
       error: () => 'Selecione um status válido'
     }),
-    taxpayerId: z.string().optional(),
+    document: z.string().optional(),
     password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres')
   })
   .check((ctx) => {
-    const { role, taxpayerId } = ctx.value;
+    const { role, document } = ctx.value;
     if (role === Role.ADMIN || role === Role.USER) {
-      if (!taxpayerId) {
+      if (!document) {
         ctx.issues.push({
           code: 'custom',
-          message: 'taxpayerId é obrigatório',
-          path: ['taxpayerId'],
-          input: taxpayerId
+          message: 'document é obrigatório',
+          path: ['document'],
+          input: document
         });
-      } else if (!/^[0-9]{11}$/.test(taxpayerId)) {
+      } else if (!/^[0-9]{11}$/.test(document)) {
         ctx.issues.push({
           code: 'custom',
-          message: 'taxpayerId deve conter 11 dígitos numéricos',
-          path: ['taxpayerId'],
-          input: taxpayerId
+          message: 'document deve conter 11 dígitos numéricos',
+          path: ['document'],
+          input: document
         });
-      } else if (!validatetaxpayerId(taxpayerId)) {
+      } else if (!validatedocument(document)) {
         ctx.issues.push({
           code: 'custom',
-          message: 'taxpayerId inválido',
-          path: ['taxpayerId'],
-          input: taxpayerId
+          message: 'document inválido',
+          path: ['document'],
+          input: document
         });
       }
     }
@@ -62,9 +59,9 @@ export const validationSchema = z
       email: data.email,
       role: data.role,
       status: data.status,
-      taxpayerId:
+      document:
         data.role === Role.ADMIN || data.role === Role.USER
-          ? (data.taxpayerId ?? '')
+          ? (data.document ?? '')
           : '',
       password: data.password
     };

@@ -1,5 +1,5 @@
-import { EquipmentCardComponent } from '../../components/EquipmentCard';
-import { EquipmentCard } from '../../actions';
+import { EquipmentCardComponent } from '../../../components/EquipmentCard';
+import { EquipmentCard } from '../../../actions';
 
 type RelatedEquipmentProps = {
   equipment: EquipmentCard[];

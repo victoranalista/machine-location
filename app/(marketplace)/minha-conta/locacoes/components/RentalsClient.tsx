@@ -23,7 +23,7 @@ import { ptBR } from 'date-fns/locale';
 import { Calendar, Package, Loader2, X } from 'lucide-react';
 import { cancelRental } from '../../actions';
 import { toast } from 'sonner';
-import { RentalStatus, PaymentStatus } from '@/prisma/generated/prisma/client';
+import { RentalStatus, PaymentStatus } from '@prisma/client';
 
 type Rental = {
   id: string;

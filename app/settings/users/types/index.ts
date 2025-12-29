@@ -1,9 +1,9 @@
-import { Role } from '@/prisma/generated/prisma/client';
+import { Role } from '@prisma/client';
 
 export interface UserFormValues {
   name: string;
   email: string;
-  taxpayerId: string;
+  document: string;
   role: Role;
 }
 

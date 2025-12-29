@@ -17,7 +17,7 @@ const UsersTableClient: React.FC<UsersTableClientProps> = ({ usersData }) => {
   const columns: Column<IUser>[] = [
     { header: 'Nome', accessor: 'name', sortable: true },
     { header: 'Email', accessor: 'email', sortable: true },
-    { header: 'CPF', accessor: 'taxpayerId', sortable: true },
+    { header: 'CPF', accessor: 'document', sortable: true },
     { header: 'Permissão', accessor: 'role', sortable: true },
     { header: 'Status', accessor: 'status', sortable: true }
   ];

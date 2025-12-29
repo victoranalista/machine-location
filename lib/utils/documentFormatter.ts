@@ -1,4 +1,4 @@
-import { FEDERAL_ORGANS } from '@/utils/constants';
+import { FEDERAL_ORGANS } from '@/lib/utils/constants';
 
 export const formatIssuingOrgan = (organ: string, state?: string): string => {
   if (!organ) return '';

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Role, ActivationStatus } from '@/lib/enums';
+import { Role, UserStatus } from '@/lib/enums';
 import { validationSchema } from './validationSchema';
 import { updateUserDataAction } from '../../update/[id]/actions';
 import { toast } from 'sonner';
@@ -57,7 +57,7 @@ export default function EditUserForm({
         placeholder: 'Digite o nome'
       },
       {
-        name: 'taxpayerId',
+        name: 'document',
         label: 'CPF/CNPJ',
         type: 'text',
         placeholder: 'Digite o CPF'
@@ -88,8 +88,8 @@ export default function EditUserForm({
         label: 'Status',
         type: 'select',
         options: [
-          { value: ActivationStatus.ACTIVE, label: 'Ativo' },
-          { value: ActivationStatus.INACTIVE, label: 'Inativo' }
+          { value: UserStatus.ACTIVE, label: 'Ativo' },
+          { value: UserStatus.INACTIVE, label: 'Inativo' }
         ]
       }
     ];

@@ -1,5 +1,5 @@
-const validatetaxpayerId = (taxpayerId: string): boolean => {
-  const cleanTaxId = taxpayerId.replace(/\D/g, '');
+const validatedocument = (document: string): boolean => {
+  const cleanTaxId = document.replace(/\D/g, '');
   if (cleanTaxId.length !== 11) return false;
   if (/^(\d)\1{10}$/.test(cleanTaxId)) return false;
   let sum = 0;
@@ -18,17 +18,16 @@ const validatetaxpayerId = (taxpayerId: string): boolean => {
   return digit === parseInt(cleanTaxId.charAt(10));
 };
 
-const cleanTaxpayerId = (taxpayerId: string): string =>
-  taxpayerId.replace(/\D/g, '');
+const cleandocument = (document: string): string => document.replace(/\D/g, '');
 
-const isValidTaxpayerId = (taxpayerId: string): boolean => {
-  const cleanId = cleanTaxpayerId(taxpayerId);
-  return cleanId.length === 11 && validatetaxpayerId(cleanId);
+const isValiddocument = (document: string): boolean => {
+  const cleanId = cleandocument(document);
+  return cleanId.length === 11 && validatedocument(cleanId);
 };
 
-const isValidtaxpayerIdOrCnpj = (input: string): boolean => {
+const isValiddocumentOrCnpj = (input: string): boolean => {
   const cleanInput = input.replace(/[^\d]/g, '');
-  if (cleanInput.length === 11) return isValidTaxpayerId(cleanInput);
+  if (cleanInput.length === 11) return isValiddocument(cleanInput);
   else if (cleanInput.length === 14) return validateCnpj(cleanInput);
   return false;
 };
@@ -119,10 +118,10 @@ const getDateString = (daysOffset: number): string => {
 
 export * from '@/lib/utils';
 export {
-  validatetaxpayerId,
-  cleanTaxpayerId,
-  isValidTaxpayerId,
-  isValidtaxpayerIdOrCnpj,
+  validatedocument,
+  cleandocument,
+  isValiddocument,
+  isValiddocumentOrCnpj,
   validateCnpj,
   handleActionError,
   validateCuidV1,

@@ -18,7 +18,7 @@ type Equipment = {
   name: string;
   dailyRate: number;
   category: { name: string };
-  owner: { name: string; email: string } | null;
+  owner: { name: string | null; email: string };
   createdAt: Date;
 };
 
@@ -29,7 +29,22 @@ export const ApprovalList = () => {
   useEffect(() => {
     const loadData = async () => {
       const data = await getAdminEquipmentList(1, 50, undefined, 'pending');
-      setEquipment(data.equipment);
+      // Convert Decimal to number
+      const processedData = data.equipment.map(
+        (
+          item: { dailyRate: { toNumber: () => number } } & Omit<
+            Equipment,
+            'dailyRate'
+          >
+        ) => ({
+          ...item,
+          dailyRate:
+            typeof item.dailyRate === 'object' && 'toNumber' in item.dailyRate
+              ? item.dailyRate.toNumber()
+              : item.dailyRate
+        })
+      );
+      setEquipment(processedData);
       setLoading(false);
     };
     loadData();

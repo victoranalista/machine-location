@@ -14,7 +14,7 @@ import Providers from '../providers';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import DarkMode from '@/components/DarkMode';
 import { requireSession } from '@/lib/auth/requireSession';
-import { Role } from '@/prisma/generated/prisma/client';
+import { Role } from '@prisma/client';
 
 const labelsAndLinks = {
   home: {

@@ -1,27 +1,27 @@
 import { useEffect, useCallback } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { UserFormValues } from '@/app/settings/users/types';
-import { isValidTaxpayerId } from '@/lib/validators';
+import { isValiddocument } from '@/lib/validators';
 import debounce from 'lodash.debounce';
-import { checkTaxpayerIdAvailability } from '@/app/settings/users/availability/actions';
-import { Role } from '@/prisma/generated/prisma/client';
+import { checkDocumentAvailability } from '@/app/settings/users/availability/actions';
+import { Role } from '@prisma/client';
 
 const validateInput = (value: string, hasInteracted: boolean) => {
-  if (!isValidTaxpayerId(value) && hasInteracted) {
-    return { type: 'manual', message: 'taxpayerId inválido' };
+  if (!isValiddocument(value) && hasInteracted) {
+    return { type: 'manual', message: 'Documento inválido' };
   }
   return null;
 };
 
 const checkAvailability = async (value: string, role: Role) => {
-  const { available, message } = await checkTaxpayerIdAvailability(value, role);
+  const { available, message } = await checkDocumentAvailability(value, role);
   if (!available) {
-    return { type: 'manual', message: message ?? 'taxpayerId indisponível' };
+    return { type: 'manual', message: message ?? 'Documento indisponível' };
   }
   return null;
 };
 
-const usePersonTaxPayerIdAvailability = (
+const usePersondocumentAvailability = (
   methods: UseFormReturn<UserFormValues>
 ) => {
   const {
@@ -30,41 +30,41 @@ const usePersonTaxPayerIdAvailability = (
     clearErrors,
     formState: { touchedFields, dirtyFields }
   } = methods;
-  const taxpayerIdValue: string = watch('taxpayerId') || '';
+  const documentValue: string = watch('document') || '';
   const roleValue = watch('role');
 
   const validate = useCallback(
     debounce(async (val: string, role: Role) => {
-      const hasInteracted = touchedFields.taxpayerId || dirtyFields.taxpayerId;
+      const hasInteracted = touchedFields.document || dirtyFields.document;
       if (!hasInteracted) return;
 
       const inputError = validateInput(val, hasInteracted);
       if (inputError) {
-        setError('taxpayerId', inputError);
+        setError('document', inputError);
         return;
       }
 
       try {
         const availabilityError = await checkAvailability(val, role);
         if (availabilityError) {
-          setError('taxpayerId', availabilityError);
+          setError('document', availabilityError);
         } else {
-          clearErrors('taxpayerId');
+          clearErrors('document');
         }
       } catch {
-        setError('taxpayerId', {
+        setError('document', {
           type: 'manual',
           message: 'Erro ao verificar disponibilidade'
         });
       }
     }, 500),
-    [setError, clearErrors, touchedFields.taxpayerId, dirtyFields.taxpayerId]
+    [setError, clearErrors, touchedFields.document, dirtyFields.document]
   );
 
   useEffect(() => {
-    validate(taxpayerIdValue, roleValue);
+    validate(documentValue, roleValue);
     return () => validate.cancel();
-  }, [taxpayerIdValue, roleValue, validate]);
+  }, [documentValue, roleValue, validate]);
 };
 
-export default usePersonTaxPayerIdAvailability;
+export default usePersondocumentAvailability;

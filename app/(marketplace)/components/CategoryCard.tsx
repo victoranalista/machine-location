@@ -9,8 +9,7 @@ import {
   Forklift,
   Cog,
   Container,
-  Tractor,
-  Crane
+  Tractor
 } from 'lucide-react';
 
 type CategoryCardProps = {
@@ -21,7 +20,7 @@ const categoryIcons: Record<string, React.ElementType> = {
   escavadeiras: Construction,
   retroescavadeiras: Truck,
   tratores: Tractor,
-  guindastes: Crane,
+  guindastes: Construction,
   empilhadeiras: Forklift,
   'plataformas-elevatorias': HardHat,
   compactadores: Cog,

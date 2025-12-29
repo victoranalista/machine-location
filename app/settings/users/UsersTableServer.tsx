@@ -1,46 +1,44 @@
 import React from 'react';
 import UsersTableClient from './UsersTableClient';
-import { Role } from '@/prisma/generated/prisma/client';
-import { ActivationStatus } from '@/prisma/generated/prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma/prisma';
 import { IUser, StatusLabel, RoleLabel } from './types';
 
 const UsersTableServer = async () => {
-  const user = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     select: {
       id: true,
-      taxpayerId: true,
-      versions: {
-        orderBy: { version: 'desc' },
-        take: 1,
-        select: { id: true, name: true, email: true, role: true, status: true }
-      }
-    }
+      document: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true
+    },
+    orderBy: { name: 'asc' }
   });
 
-  const activeTranslation: Record<ActivationStatus, StatusLabel> = {
-    ACTIVE: 'Ativo',
-    INACTIVE: 'Inativo'
+  const roleTranslation: Record<Role, RoleLabel> = {
+    ADMIN: 'Admin',
+    USER: 'Usuário',
+    SUPPLIER: 'Fornecedor'
   };
 
-  const usersData: IUser[] = user.map((user) => {
-    const status: StatusLabel =
-      activeTranslation[user.versions[0]?.status ?? ActivationStatus.INACTIVE];
-    return {
-      id: user.versions[0]?.id ?? 0,
-      taxpayerId: user.taxpayerId,
-      name: user.versions[0]?.name ?? '',
-      email: user.versions[0]?.email ?? '',
-      role: roleTranslation[user.versions[0]?.role ?? 'USER'],
-      status: status
-    };
-  });
-  return <UsersTableClient usersData={usersData} />;
-};
+  const statusTranslation: Record<UserStatus, StatusLabel> = {
+    ACTIVE: 'Ativo',
+    INACTIVE: 'Inativo',
+    SUSPENDED: 'Suspenso'
+  };
 
-const roleTranslation: Record<Role, RoleLabel> = {
-  ADMIN: 'Admin',
-  USER: 'Usuário'
+  const usersData: IUser[] = users.map((user: (typeof users)[number]) => ({
+    id: user.id,
+    document: user.document ?? '',
+    name: user.name ?? '',
+    email: user.email,
+    role: roleTranslation[user.role],
+    status: statusTranslation[user.status]
+  }));
+
+  return <UsersTableClient usersData={usersData} />;
 };
 
 export default UsersTableServer;

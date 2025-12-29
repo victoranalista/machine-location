@@ -1,7 +1,7 @@
 'use client';
 import { useSession as useNextAuthSession } from 'next-auth/react';
 import { useMemo } from 'react';
-import type { Role } from '@/prisma/generated/prisma/client';
+import type { Role } from '@prisma/client';
 
 interface SessionUser {
   name?: string | null;

@@ -85,7 +85,7 @@ const statusConfig: Record<
   AVAILABLE: { label: 'Disponível', variant: 'default' },
   RENTED: { label: 'Alugado', variant: 'secondary' },
   MAINTENANCE: { label: 'Manutenção', variant: 'outline' },
-  RETIRED: { label: 'Retirado', variant: 'destructive' }
+  UNAVAILABLE: { label: 'Indisponível', variant: 'destructive' }
 };
 
 const EquipmentTable = ({ data, page, search }: EquipmentTableProps) => {
@@ -104,7 +104,7 @@ const EquipmentTable = ({ data, page, search }: EquipmentTableProps) => {
 
   const handleStatusChange = (
     id: string,
-    status: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'RETIRED'
+    status: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'UNAVAILABLE'
   ) => {
     startTransition(async () => {
       const result = await updateEquipment(id, { status });

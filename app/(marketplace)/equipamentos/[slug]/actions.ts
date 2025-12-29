@@ -1,7 +1,7 @@
 'use server';
 
 import { prismaNeon } from '@/lib/prisma/prismaNeon';
-import { EquipmentStatus } from '@/prisma/generated/prisma/client';
+import { EquipmentStatus } from '@prisma/client';
 
 export type EquipmentDetail = {
   id: string;
@@ -53,7 +53,10 @@ export const getEquipmentBySlug = async (
     where: { slug },
     data: { viewCount: { increment: 1 } }
   });
-  const totalRatings = equipment.reviews.reduce((sum, r) => sum + r.rating, 0);
+  const totalRatings = equipment.reviews.reduce(
+    (sum: number, r: { rating: number }) => sum + r.rating,
+    0
+  );
   const averageRating =
     equipment.reviews.length > 0 ? totalRatings / equipment.reviews.length : 0;
   return {
@@ -86,18 +89,32 @@ export const getEquipmentBySlug = async (
     status: equipment.status,
     brand: equipment.brand,
     category: equipment.category,
-    images: equipment.images.map((img) => ({
-      id: img.id,
-      url: img.url,
-      alt: img.alt,
-      isPrimary: img.isPrimary
-    })),
-    specs: equipment.specs.map((spec) => ({
-      id: spec.id,
-      name: spec.name,
-      value: spec.value,
-      unit: spec.unit
-    })),
+    images: equipment.images.map(
+      (img: {
+        id: string;
+        url: string;
+        alt: string | null;
+        isPrimary: boolean;
+      }) => ({
+        id: img.id,
+        url: img.url,
+        alt: img.alt,
+        isPrimary: img.isPrimary
+      })
+    ),
+    specs: equipment.specs.map(
+      (spec: {
+        id: string;
+        name: string;
+        value: string;
+        unit: string | null;
+      }) => ({
+        id: spec.id,
+        name: spec.name,
+        value: spec.value,
+        unit: spec.unit
+      })
+    ),
     averageRating,
     reviewCount: equipment.reviews.length
   };
@@ -126,7 +143,7 @@ export const getRelatedEquipment = async (
     dailyRate: Number(eq.dailyRate),
     weeklyRate: eq.weeklyRate ? Number(eq.weeklyRate) : null,
     monthlyRate: eq.monthlyRate ? Number(eq.monthlyRate) : null
-  }));
+  })) satisfies import('../../actions').EquipmentCard[];
 };
 
 export const checkEquipmentAvailability = async (

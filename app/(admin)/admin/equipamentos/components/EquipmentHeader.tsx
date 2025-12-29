@@ -72,7 +72,8 @@ const EquipmentHeader = ({
         model: (formData.get('model') as string) || undefined,
         dailyRate: Number(formData.get('dailyRate')),
         weeklyRate: Number(formData.get('weeklyRate')) || undefined,
-        monthlyRate: Number(formData.get('monthlyRate')) || undefined
+        monthlyRate: Number(formData.get('monthlyRate')) || undefined,
+        ownerId: formData.get('ownerId') as string
       });
       toast.success('Equipamento criado com sucesso');
       setOpen(false);

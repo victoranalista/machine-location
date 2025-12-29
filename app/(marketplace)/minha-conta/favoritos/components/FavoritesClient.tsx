@@ -40,7 +40,7 @@ const FavoriteCard = ({ favorite }: { favorite: Favorite }) => {
   const handleRemove = () => {
     startTransition(async () => {
       const result = await toggleFavorite(equipment.id);
-      if (result.success) toast.success('Removido dos favoritos');
+      if (!result.favorited) toast.success('Removido dos favoritos');
     });
   };
 

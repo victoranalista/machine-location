@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import DarkMode from '@/components/DarkMode';
 import { useCallback, useMemo } from 'react';
-import { NavItem } from '../impetus-energy/app/settings/nav-item';
+import { NavItem } from '@/app/settings/nav-item';
 import { useSession } from '@/lib/hooks/use-session';
 import { handleSignOut } from '../app/login/actions';
 

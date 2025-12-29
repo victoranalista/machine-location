@@ -1,11 +1,11 @@
-import { Role, ActivationStatus } from '@/prisma/generated/prisma/enums';
+import { Role, UserStatus } from '@prisma/client';
 
-export type RoleLabel = 'Admin' | 'Usuário';
-export type StatusLabel = 'Ativo' | 'Inativo';
+export type RoleLabel = 'Admin' | 'Usuário' | 'Fornecedor';
+export type StatusLabel = 'Ativo' | 'Inativo' | 'Suspenso';
 
 export interface IUser {
-  id: number;
-  taxpayerId: string;
+  id: string;
+  document: string;
   name: string;
   email: string;
   role: RoleLabel;
@@ -17,8 +17,8 @@ export interface UserFormValues {
   name: string;
   email: string;
   role: Role;
-  status: ActivationStatus;
-  taxpayerId?: string;
+  status: UserStatus;
+  document?: string;
   password: string;
 }
 
@@ -35,12 +35,12 @@ export interface UsersTableClientProps {
 }
 
 export interface EditFormValues {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: Role;
-  status: ActivationStatus;
-  taxpayerId?: string;
+  status: UserStatus;
+  document?: string;
   password?: string;
 }
 
@@ -53,11 +53,11 @@ export interface FieldEdit {
 }
 
 export interface UpdateUserDataInput {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: Role;
-  status: ActivationStatus;
+  status: UserStatus;
   password?: string;
 }
 
@@ -67,7 +67,7 @@ export interface IAvailabilityResponse {
 }
 
 export interface BulkParams {
-  userHistoryIds: number[];
+  userHistoryIds: string[];
 }
 
 export interface ICheckResult {
@@ -77,6 +77,6 @@ export interface ICheckResult {
   name: string;
   email: string;
   role: Role;
-  status: ActivationStatus;
+  status: UserStatus;
   password?: string;
 }

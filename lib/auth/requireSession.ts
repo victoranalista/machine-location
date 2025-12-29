@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { NextResponse } from 'next/server';
-import { Role } from '@/prisma/generated/prisma/client';
+import { Role } from '@prisma/client';
 
 const ALLOWED_ROLES: Role[] = [Role.ADMIN, Role.USER];
 

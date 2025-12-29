@@ -1,28 +1,28 @@
 'use server';
-import { validatetaxpayerId } from '@/lib/validators';
 import { prisma } from '@/lib/prisma/prisma';
-import { Role } from '@/prisma/generated/prisma/client';
+import { Role } from '@prisma/client';
 import { IAvailabilityResponse } from '../types';
 import { requireSession } from '@/lib/auth/requireSession';
 
-const isRoleRequiresTaxpayerId = (role: Role): boolean =>
+const isRoleRequiresDocument = (role: Role): boolean =>
   role === Role.ADMIN || role === Role.USER;
 
 const validateLength = (cleanId: string): IAvailabilityResponse => {
   if (cleanId.length !== 11) {
     return {
       available: false,
-      message: 'taxpayerId deve conter 11 dígitos numéricos'
+      message: 'Documento deve conter 11 dígitos numéricos'
     };
   }
   return { available: true };
 };
 
 const validateFormat = (cleanId: string): IAvailabilityResponse => {
-  if (!validatetaxpayerId(cleanId)) {
+  // Simple validation - check if all characters are digits
+  if (!/^\d{11}$/.test(cleanId)) {
     return {
       available: false,
-      message: 'taxpayerId inválido'
+      message: 'Documento inválido'
     };
   }
   return { available: true };
@@ -33,34 +33,34 @@ const checkExistence = async (
 ): Promise<IAvailabilityResponse> => {
   const exists = await prisma.user.findFirst({
     where: {
-      taxpayerId: cleanId
+      document: cleanId
     },
     select: { id: true }
   });
   if (exists) {
     return {
       available: false,
-      message: 'taxpayerId já está em uso'
+      message: 'Documento já está em uso'
     };
   }
   return { available: true };
 };
 
-export const checkTaxpayerIdAvailability = async (
-  taxpayerId: string,
+export const checkDocumentAvailability = async (
+  document: string,
   role: Role
 ): Promise<IAvailabilityResponse> => {
   await requireSession([Role.ADMIN]);
-  if (!isRoleRequiresTaxpayerId(role)) {
+  if (!isRoleRequiresDocument(role)) {
     return { available: true };
   }
-  if (!taxpayerId) {
+  if (!document) {
     return {
       available: false,
-      message: 'taxpayerId é obrigatório'
+      message: 'Documento é obrigatório'
     };
   }
-  const cleanId = taxpayerId.replace(/\D/g, '');
+  const cleanId = document.replace(/\D/g, '');
   const lengthCheck = validateLength(cleanId);
   if (!lengthCheck.available) return lengthCheck;
   const formatCheck = validateFormat(cleanId);

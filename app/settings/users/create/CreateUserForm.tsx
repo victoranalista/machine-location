@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Role, ActivationStatus } from '@/lib/enums';
-import usePersonTaxPayerIdAvailability from '@/lib/hooks/usePersonTaxPayerIdAvailability';
+import { Role, UserStatus } from '@/lib/enums';
+import usePersonDocumentAvailability from '@/lib/hooks/usePersonTaxPayerIdAvailability';
 import { validationSchema } from './validationSchema';
 import { toast } from 'sonner';
 import { createUser } from './actions';
@@ -37,8 +37,8 @@ export default function CreateUserForm() {
       name: '',
       email: '',
       role: Role.USER,
-      status: ActivationStatus.ACTIVE,
-      taxpayerId: '',
+      status: UserStatus.ACTIVE,
+      document: '',
       password: ''
     },
     mode: 'onChange'
@@ -49,7 +49,7 @@ export default function CreateUserForm() {
     defaultValue: Role.USER
   });
 
-  usePersonTaxPayerIdAvailability(methods as any);
+  usePersonDocumentAvailability(methods as any);
 
   const fields = useMemo<Array<Field>>(() => {
     const baseFields: Array<Field> = [
@@ -85,14 +85,14 @@ export default function CreateUserForm() {
         label: 'Status',
         type: 'select',
         options: [
-          { value: ActivationStatus.ACTIVE, label: 'Ativo' },
-          { value: ActivationStatus.INACTIVE, label: 'Inativo' }
+          { value: UserStatus.ACTIVE, label: 'Ativo' },
+          { value: UserStatus.INACTIVE, label: 'Inativo' }
         ]
       }
     ];
     if (currentRole === Role.ADMIN || currentRole === Role.USER) {
       baseFields.push({
-        name: 'taxpayerId',
+        name: 'document',
         label: 'CPF',
         type: 'text',
         placeholder: 'Digite o CPF'
@@ -105,7 +105,7 @@ export default function CreateUserForm() {
     try {
       const userData = {
         ...validationSchema.parse(data),
-        taxpayerId: data.taxpayerId ?? ''
+        document: data.document ?? ''
       };
       const result = await createUser(userData);
       if (result && typeof result === 'object' && 'success' in result) {

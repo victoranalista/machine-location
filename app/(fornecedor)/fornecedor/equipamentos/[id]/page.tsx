@@ -14,7 +14,7 @@ const EditEquipamentoPage = async ({
   const { id } = await params;
   const equipment = await prisma.equipment.findUnique({
     where: { id, ownerId: session.user.id },
-    include: { category: true, brand: true, location: true }
+    include: { category: true, brand: true }
   });
   if (!equipment) notFound();
   return (

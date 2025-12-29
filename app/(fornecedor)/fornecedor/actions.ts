@@ -7,9 +7,9 @@ import { revalidatePath } from 'next/cache';
 // Helper para verificar fornecedor
 const requireSupplier = async () => {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user?.id) throw new Error('Unauthorized');
   // if (session.user.role !== 'SUPPLIER') throw new Error('Forbidden');
-  return session.user;
+  return { ...session.user, id: session.user.id as string };
 };
 
 // Dashboard Stats
@@ -88,9 +88,19 @@ export const createSupplierEquipment = async (data: {
 
   const equipment = await prisma.equipment.create({
     data: {
-      ...data,
+      name: data.name,
+      description: data.description,
+      categoryId: data.categoryId,
       slug,
       ownerId: user.id,
+      dailyRate: data.dailyRate,
+      weeklyRate: data.weeklyRate,
+      monthlyRate: data.monthlyRate,
+      brandId: data.brandId,
+      model: data.model,
+      year: data.year,
+      city: data.city,
+      state: data.state,
       isApproved: false, // Precisa aprovação do admin
       status: 'MAINTENANCE' // Fica em manutenção até ser aprovado
     }
@@ -153,7 +163,7 @@ export const deleteSupplierEquipment = async (id: string) => {
 export const getSupplierRentals = async (page = 1, perPage = 10) => {
   const user = await requireSupplier();
 
-  const [rentals, total] = await Promise.all([
+  const [rentalsData, total] = await Promise.all([
     prisma.rental.findMany({
       where: {
         equipment: { ownerId: user.id }
@@ -172,6 +182,12 @@ export const getSupplierRentals = async (page = 1, perPage = 10) => {
       }
     })
   ]);
+
+  const rentals = rentalsData.map((rental) => ({
+    ...rental,
+    total: rental.total.toNumber(),
+    dailyRate: rental.dailyRate.toNumber()
+  }));
 
   return { rentals, total, totalPages: Math.ceil(total / perPage) };
 };

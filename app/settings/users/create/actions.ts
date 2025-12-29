@@ -1,18 +1,13 @@
 'use server';
-import {
-  cleanTaxpayerId,
-  isValidTaxpayerId,
-  handleActionError
-} from '@/lib/validators';
 import { prisma } from '@/lib/prisma/prisma';
-import { Role, ActivationStatus } from '@/prisma/generated/prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 import { requireSession } from '@/lib/auth/requireSession';
 import { ensurePasswordHashed } from '@/lib/auth/password';
 
 interface UserData {
   name: string;
   email: string;
-  taxpayerId: string;
+  document: string;
   role: Role;
   password: string;
 }
@@ -22,57 +17,56 @@ interface ActionResult {
   message?: string;
 }
 
+const cleanDocument = (doc: string): string => doc.replace(/\D/g, '');
+
+const isValidDocument = (doc: string): boolean => {
+  const clean = cleanDocument(doc);
+  return clean.length === 11 && /^\d{11}$/.test(clean);
+};
+
 const validateUserData = (data: UserData): string | null => {
   if (!data.name?.trim()) return 'Nome é obrigatório';
   if (!data.email?.trim()) return 'Email é obrigatório';
-  if (!data.taxpayerId?.trim()) return 'CPF é obrigatório';
+  if (!data.document?.trim()) return 'CPF é obrigatório';
   if (!data.password || data.password.length < 6)
     return 'Senha deve ter pelo menos 6 caracteres';
-  if (!isValidTaxpayerId(data.taxpayerId)) return 'CPF inválido';
+  if (!isValidDocument(data.document)) return 'CPF inválido';
   return null;
 };
 
 const prepareUserData = async (data: UserData) => ({
-  taxpayerId: cleanTaxpayerId(data.taxpayerId),
-  status: ActivationStatus.ACTIVE,
-  versions: {
-    create: {
-      version: 1,
-      name: data.name.trim(),
-      email: data.email.trim().toLowerCase(),
-      role: data.role,
-      status: ActivationStatus.ACTIVE,
-      password: await ensurePasswordHashed(data.password.trim())
-    }
-  }
+  document: cleanDocument(data.document),
+  name: data.name.trim(),
+  email: data.email.trim().toLowerCase(),
+  role: data.role,
+  status: UserStatus.ACTIVE,
+  password: await ensurePasswordHashed(data.password.trim())
 });
 
 const checkUserAvailability = async (
   email: string,
-  taxpayerId: string,
-  excludeId?: number
+  document: string,
+  excludeId?: string
 ) => {
-  const cleanId = cleanTaxpayerId(taxpayerId);
-  const [existingEmail, existingTaxpayerId] = await Promise.all([
-    prisma.userHistory.findFirst({
+  const cleanDoc = cleanDocument(document);
+  const [existingEmail, existingDocument] = await Promise.all([
+    prisma.user.findFirst({
       where: {
         email: email.toLowerCase(),
-        status: ActivationStatus.ACTIVE,
-        ...(excludeId && { userId: { not: excludeId } })
+        ...(excludeId && { id: { not: excludeId } })
       },
       select: { id: true }
     }),
     prisma.user.findFirst({
       where: {
-        taxpayerId: cleanId,
-        status: ActivationStatus.ACTIVE,
+        document: cleanDoc,
         ...(excludeId && { id: { not: excludeId } })
       },
       select: { id: true }
     })
   ]);
   if (existingEmail) return 'Email já está em uso';
-  if (existingTaxpayerId) return 'CPF já está em uso';
+  if (existingDocument) return 'CPF já está em uso';
   return null;
 };
 
@@ -83,7 +77,7 @@ export const createUser = async (data: UserData): Promise<ActionResult> => {
   try {
     const availabilityError = await checkUserAvailability(
       data.email,
-      data.taxpayerId
+      data.document
     );
     if (availabilityError)
       return { success: false, message: availabilityError };
@@ -91,7 +85,7 @@ export const createUser = async (data: UserData): Promise<ActionResult> => {
     await prisma.user.create({ data: userData });
     return { success: true, message: 'Usuário criado com sucesso' };
   } catch (error) {
-    console.error('Error creating user');
+    console.error('Error creating user:', error);
     return { success: false, message: 'Erro ao criar usuário' };
   }
 };

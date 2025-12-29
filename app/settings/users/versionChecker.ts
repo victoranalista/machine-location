@@ -1,9 +1,12 @@
-import { Prisma } from '@/prisma/generated/prisma/client';
+import { Prisma } from '@prisma/client';
+
+// This file is deprecated - the user versioning system has been removed
+// Keeping as stub for backwards compatibility
 
 export interface UserVersionCheckResult {
-  id: number;
+  id: string;
   version: number;
-  userId: number;
+  userId: string;
   name: string;
   email: string;
   role: string;
@@ -12,46 +15,10 @@ export interface UserVersionCheckResult {
 
 const checker = async (
   prisma: Prisma.TransactionClient,
-  userHistoryId: number
+  userId: string
 ): Promise<UserVersionCheckResult | false> => {
-  const userHistoryData = await prisma.userHistory.findFirst({
-    where: { id: userHistoryId },
-    select: {
-      id: true,
-      version: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      user: {
-        select: {
-          id: true,
-          versions: {
-            orderBy: { version: 'desc' },
-            take: 1,
-            select: { id: true }
-          }
-        }
-      }
-    }
-  });
-
-  if (
-    !userHistoryData?.user?.versions[0] ||
-    userHistoryData.user.versions[0].id !== userHistoryId
-  ) {
-    return false;
-  }
-
-  return {
-    id: userHistoryData.id,
-    version: userHistoryData.version,
-    userId: userHistoryData.user.id,
-    name: userHistoryData.name,
-    email: userHistoryData.email,
-    role: userHistoryData.role,
-    status: userHistoryData.status
-  };
+  // Versioning system removed - this is now a no-op stub
+  return false;
 };
 
 export default checker;

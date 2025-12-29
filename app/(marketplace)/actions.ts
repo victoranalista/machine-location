@@ -1,7 +1,7 @@
 'use server';
 
 import { prismaNeon } from '@/lib/prisma/prismaNeon';
-import { EquipmentStatus } from '@/prisma/generated/prisma/client';
+import { EquipmentStatus } from '@prisma/client';
 
 export type CategoryWithCount = {
   id: string;
@@ -89,15 +89,25 @@ export const getCategories = async (): Promise<CategoryWithCount[]> => {
     include: { _count: { select: { equipment: true } } },
     orderBy: { name: 'asc' }
   });
-  return categories.map((cat) => ({
-    id: cat.id,
-    name: cat.name,
-    slug: cat.slug,
-    description: cat.description,
-    icon: cat.icon,
-    imageUrl: cat.imageUrl,
-    equipmentCount: cat._count.equipment
-  }));
+  return categories.map(
+    (cat: {
+      id: string;
+      name: string;
+      slug: string;
+      description: string | null;
+      icon: string | null;
+      imageUrl: string | null;
+      _count: { equipment: number };
+    }) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      icon: cat.icon,
+      imageUrl: cat.imageUrl,
+      equipmentCount: cat._count.equipment
+    })
+  );
 };
 
 export const getFeaturedEquipment = async (
@@ -117,7 +127,7 @@ export const getFeaturedEquipment = async (
     dailyRate: Number(eq.dailyRate),
     weeklyRate: eq.weeklyRate ? Number(eq.weeklyRate) : null,
     monthlyRate: eq.monthlyRate ? Number(eq.monthlyRate) : null
-  }));
+  })) satisfies EquipmentCard[];
 };
 
 export const getEquipmentList = async (filters: EquipmentFilters) => {
@@ -145,7 +155,7 @@ export const getEquipmentList = async (filters: EquipmentFilters) => {
       dailyRate: Number(eq.dailyRate),
       weeklyRate: eq.weeklyRate ? Number(eq.weeklyRate) : null,
       monthlyRate: eq.monthlyRate ? Number(eq.monthlyRate) : null
-    })),
+    })) satisfies EquipmentCard[],
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
   };
 };
@@ -164,11 +174,19 @@ export const getBrands = async () => {
     include: { _count: { select: { equipment: true } } },
     orderBy: { name: 'asc' }
   });
-  return brands.map((b) => ({
-    id: b.id,
-    name: b.name,
-    slug: b.slug,
-    logoUrl: b.logoUrl,
-    equipmentCount: b._count.equipment
-  }));
+  return brands.map(
+    (b: {
+      id: string;
+      name: string;
+      slug: string;
+      logoUrl: string | null;
+      _count: { equipment: number };
+    }) => ({
+      id: b.id,
+      name: b.name,
+      slug: b.slug,
+      logoUrl: b.logoUrl,
+      equipmentCount: b._count.equipment
+    })
+  );
 };

@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth/auth';
 import { prismaNeon } from '@/lib/prisma/prismaNeon';
 import { revalidatePath } from 'next/cache';
-import { RentalStatus } from '@/prisma/generated/prisma/client';
+import { RentalStatus } from '@prisma/client';
 
 const getUserId = async () => {
   const session = await auth();
@@ -31,7 +31,7 @@ export const getUserRentals = async (status?: RentalStatus) => {
     },
     orderBy: { createdAt: 'desc' }
   });
-  return rentals.map((rental) => ({
+  return rentals.map((rental: (typeof rentals)[number]) => ({
     id: rental.id,
     rentalNumber: rental.rentalNumber,
     startDate: rental.startDate,
@@ -84,7 +84,7 @@ export const getUserFavorites = async () => {
     },
     orderBy: { createdAt: 'desc' }
   });
-  return favorites.map((fav) => ({
+  return favorites.map((fav: (typeof favorites)[number]) => ({
     id: fav.id,
     equipment: {
       id: fav.equipment.id,
@@ -127,9 +127,8 @@ export const toggleFavorite = async (equipmentId: string) => {
 export const getUserProfile = async () => {
   const session = await auth();
   if (!session?.user?.email) throw new Error('Não autorizado');
-  const user = await prismaNeon.userHistory.findFirst({
-    where: { email: session.user.email, status: 'ACTIVE' },
-    orderBy: { version: 'desc' },
+  const user = await prismaNeon.user.findUnique({
+    where: { email: session.user.email },
     select: {
       id: true,
       name: true,

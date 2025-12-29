@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth/auth';
 import { prismaNeon } from '@/lib/prisma/prismaNeon';
 import { revalidatePath } from 'next/cache';
 import { nanoid } from 'nanoid';
-import { RentalStatus, PaymentStatus } from '@/prisma/generated/prisma/client';
+import { RentalStatus, PaymentStatus } from '@prisma/client';
 
 type CartItemInput = {
   equipmentId: string;
@@ -92,7 +92,7 @@ export const getCartItems = async () => {
     },
     orderBy: { createdAt: 'desc' }
   });
-  return items.map((item) => ({
+  return items.map((item: (typeof items)[number]) => ({
     id: item.id,
     equipmentId: item.equipmentId,
     startDate: item.startDate,

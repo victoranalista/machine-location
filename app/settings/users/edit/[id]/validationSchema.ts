@@ -1,18 +1,15 @@
 import { z } from 'zod';
 import { EditFormValues } from '../../types';
-import { Role, ActivationStatus } from '@/lib/enums';
+import { Role, UserStatus } from '@/lib/enums';
 
 const RoleEnum = [Role.ADMIN, Role.USER] as const;
-const StatusEnum = [
-  ActivationStatus.ACTIVE,
-  ActivationStatus.INACTIVE
-] as const;
+const StatusEnum = [UserStatus.ACTIVE, UserStatus.INACTIVE] as const;
 
 export const validationSchema = z
   .object({
-    id: z.number({
+    id: z.string({
       error: (issue) =>
-        issue.code === 'invalid_type' ? 'O ID deve ser um número' : undefined
+        issue.code === 'invalid_type' ? 'O ID deve ser uma string' : undefined
     }),
     name: z.string({
       error: (issue) =>
@@ -22,7 +19,7 @@ export const validationSchema = z
     role: z.enum(RoleEnum, {
       error: () => 'Selecione uma permissão válida'
     }),
-    taxpayerId: z.string().min(1, 'CPF/CNPJ é obrigatório.'),
+    document: z.string().min(1, 'CPF/CNPJ é obrigatório.'),
     status: z.enum(StatusEnum, {
       error: () => 'Selecione um status válido'
     }),
@@ -39,7 +36,7 @@ export const validationSchema = z
       name: data.name,
       email: data.email,
       role: data.role,
-      taxpayerId: data.taxpayerId,
+      document: data.document,
       status: data.status,
       password: data.password
     };

@@ -14,7 +14,7 @@ type Rental = {
   total: number;
   status: string;
   paymentStatus: string;
-  user: { name: string; email: string };
+  user: { name: string | null; email: string };
   equipment: { name: string };
 };
 

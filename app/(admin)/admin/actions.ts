@@ -118,6 +118,7 @@ export const createEquipment = async (data: {
   monthlyRate?: number;
   minRentalDays?: number;
   locationId?: string;
+  ownerId: string;
 }) => {
   await requireAdmin();
 
@@ -126,7 +127,8 @@ export const createEquipment = async (data: {
       ...data,
       dailyRate: data.dailyRate,
       weeklyRate: data.weeklyRate,
-      monthlyRate: data.monthlyRate
+      monthlyRate: data.monthlyRate,
+      ownerId: data.ownerId
     }
   });
 
@@ -142,7 +144,7 @@ export const updateEquipment = async (
     dailyRate?: number;
     weeklyRate?: number;
     monthlyRate?: number;
-    status?: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'RETIRED';
+    status?: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'UNAVAILABLE';
     isApproved?: boolean;
   }
 ) => {

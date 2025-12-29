@@ -3,7 +3,7 @@ export enum Role {
   USER = 'USER'
 }
 
-export enum ActivationStatus {
+export enum UserStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE'
 }

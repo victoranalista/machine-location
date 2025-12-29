@@ -25,7 +25,7 @@ export default function Loading() {
               <Skeleton className="h-10 w-full" />
             </div>
 
-            {/* Campo Anexar taxpayerId */}
+            {/* Campo Anexar document */}
             <div>
               <Skeleton className="h-4 w-24 mb-2" />
               <Skeleton className="h-10 w-full" />
