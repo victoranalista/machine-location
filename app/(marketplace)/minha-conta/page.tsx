@@ -15,15 +15,17 @@ const StatCard = ({
   icon: React.ElementType;
   href: string;
 }) => (
-  <Link href={href}>
+  <Link href={href} className="block">
     <Card className="transition-all hover:border-primary hover:shadow-md">
-      <CardContent className="flex items-center gap-4 p-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-          <Icon className="h-6 w-6 text-primary" />
+      <CardContent className="flex items-center gap-3 p-4 sm:gap-4 sm:p-6">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:h-12 sm:w-12">
+          <Icon className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
         </div>
-        <div>
-          <p className="text-2xl font-bold">{value}</p>
-          <p className="text-sm text-muted-foreground">{title}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-xl font-bold sm:text-2xl">{value}</p>
+          <p className="truncate text-xs text-muted-foreground sm:text-sm">
+            {title}
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -40,14 +42,16 @@ const MinhaContaPage = async () => {
   );
   const pendingRentals = allRentals.filter((r) => r.status === 'PENDING');
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Minha Conta</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Minha Conta
+        </h1>
+        <p className="text-sm text-muted-foreground sm:text-base">
           Gerencie suas locações e preferências
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         <StatCard
           title="Locações Ativas"
           value={activeRentals.length}
@@ -75,8 +79,10 @@ const MinhaContaPage = async () => {
       </div>
       {activeRentals.length > 0 && (
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Locações Ativas</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg sm:text-xl">
+              Locações Ativas
+            </CardTitle>
             <Link href="/minha-conta/locacoes">
               <Button variant="ghost" size="sm">
                 Ver todas
@@ -84,20 +90,26 @@ const MinhaContaPage = async () => {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {activeRentals.slice(0, 3).map((rental) => (
                 <div
                   key={rental.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4"
                 >
-                  <div>
-                    <p className="font-semibold">{rental.equipment.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold">
+                      {rental.equipment.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground sm:text-sm">
                       {rental.rentalNumber} • {rental.totalDays} dias
                     </p>
                   </div>
                   <Link href={`/minha-conta/locacoes/${rental.id}`}>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
                       Detalhes
                     </Button>
                   </Link>

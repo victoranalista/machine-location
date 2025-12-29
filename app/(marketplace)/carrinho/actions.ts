@@ -32,9 +32,8 @@ const getSessionId = async () => {
 const getUserId = async () => {
   const session = await auth();
   if (!session?.user?.email) throw new Error('Não autorizado');
-  const user = await prismaNeon.userHistory.findFirst({
+  const user = await prismaNeon.user.findUnique({
     where: { email: session.user.email, status: 'ACTIVE' },
-    orderBy: { version: 'desc' },
     select: { id: true }
   });
   if (!user) throw new Error('Usuário não encontrado');

@@ -5,12 +5,21 @@ import { prismaNeon } from '@/lib/prisma/prismaNeon';
 import { revalidatePath } from 'next/cache';
 import { RentalStatus } from '@prisma/client';
 
+type UserProfileUpdate = {
+  name: string;
+  phone?: string;
+  company?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+};
+
 const getUserId = async () => {
   const session = await auth();
   if (!session?.user?.email) throw new Error('Não autorizado');
-  const user = await prismaNeon.userHistory.findFirst({
+  const user = await prismaNeon.user.findUnique({
     where: { email: session.user.email, status: 'ACTIVE' },
-    orderBy: { version: 'desc' },
     select: { id: true }
   });
   if (!user) throw new Error('Usuário não encontrado');
@@ -145,37 +154,24 @@ export const getUserProfile = async () => {
   return user;
 };
 
-export const updateUserProfile = async (data: {
-  name: string;
-  phone?: string;
-  company?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-}) => {
-  const userId = await getUserId();
-  const currentUser = await prismaNeon.userHistory.findUnique({
-    where: { id: userId }
-  });
-  if (!currentUser) throw new Error('Usuário não encontrado');
-  await prismaNeon.userHistory.create({
+const updateUserData = async (userId: string, data: UserProfileUpdate) => {
+  await prismaNeon.user.update({
+    where: { id: userId },
     data: {
-      email: currentUser.email,
       name: data.name,
-      password: currentUser.password,
-      role: currentUser.role,
-      status: currentUser.status,
       phone: data.phone,
       company: data.company,
-      document: currentUser.document,
       address: data.address,
       city: data.city,
       state: data.state,
-      zipCode: data.zipCode,
-      version: currentUser.version + 1
+      zipCode: data.zipCode
     }
   });
+};
+
+export const updateUserProfile = async (data: UserProfileUpdate) => {
+  const userId = await getUserId();
+  await updateUserData(userId, data);
   revalidatePath('/minha-conta');
   return { success: true };
 };
