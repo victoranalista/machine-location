@@ -20,7 +20,7 @@ import {
 import { getSupplierDashboardStats } from './actions';
 
 export const metadata = {
-  title: 'Painel do Fornecedor | EquipRent',
+  title: 'Painel do Fornecedor | MaquinaLoc',
   description: 'Gerencie seus equipamentos'
 };
 

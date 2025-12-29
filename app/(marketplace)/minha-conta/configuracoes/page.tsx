@@ -4,7 +4,7 @@ import { SettingsForm } from './components/SettingsForm';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata = {
-  title: 'Configurações | EquipRent',
+  title: 'Configurações | MaquinaLoc',
   description: 'Configurações da sua conta'
 };
 

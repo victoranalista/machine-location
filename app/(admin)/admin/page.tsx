@@ -21,7 +21,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export const metadata = {
-  title: 'Admin Dashboard | EquipRent',
+  title: 'Admin Dashboard | MaquinaLoc',
   description: 'Painel administrativo'
 };
 

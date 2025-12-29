@@ -4,7 +4,7 @@ import { FavoritesClient } from './components/FavoritesClient';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata = {
-  title: 'Meus Favoritos | EquipRent',
+  title: 'Meus Favoritos | MaquinaLoc',
   description: 'Seus equipamentos favoritos salvos'
 };
 
