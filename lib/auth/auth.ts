@@ -98,20 +98,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     jwt: async ({ token, user, trigger }) => {
       if (user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email!, status: 'ACTIVE' },
-          select: { role: true, name: true }
-        });
-        token.name = dbUser?.name;
+        token.id = user.id;
+        token.name = user.name;
         token.email = user.email;
-        token.role = dbUser?.role;
+        token.role = user.role;
+      }
+      if (!token.id && token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email, status: 'ACTIVE' },
+          select: { id: true, role: true, name: true }
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+        }
       }
       if (trigger === 'update' && token.email) {
         const dbUser = await prisma.user.findUnique({
-          where: { email: token.email as string, status: 'ACTIVE' },
-          select: { role: true, name: true }
+          where: { email: token.email, status: 'ACTIVE' },
+          select: { id: true, role: true, name: true }
         });
         if (dbUser) {
+          token.id = dbUser.id;
           token.name = dbUser.name;
           token.role = dbUser.role;
         }
@@ -119,9 +128,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     session: async ({ session, token }) => {
-      if (token) {
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
+      if (token?.id && typeof token.id === 'string') {
+        session.user.id = token.id;
+        session.user.name = token.name || '';
+        session.user.email = token.email || '';
         const role = token.role;
         const isValidRole = isRecognizedRole(role);
         if (isValidRole) session.user.role = role;
