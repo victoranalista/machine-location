@@ -1,9 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin, Loader2 } from 'lucide-react';
+import { reverseGeocode } from './actions';
+import { toast } from 'sonner';
 
 type LocationState = {
   city: string;
@@ -11,42 +13,75 @@ type LocationState = {
   error: boolean;
 };
 
+const GEOLOCATION_TIMEOUT = 15000;
+
 export const HeroSection = () => {
+  const router = useRouter();
   const [location, setLocation] = useState<LocationState>({
     city: '',
     loading: false,
     error: false
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+  const handleGeolocationError = (error: GeolocationPositionError) => {
+    const messages: Record<number, string> = {
+      1: 'Permissão de localização negada. Por favor, permita o acesso à localização.',
+      2: 'Localização indisponível no momento',
+      3: 'Tempo esgotado ao obter localização'
+    };
+    const message = messages[error.code] || 'Erro ao obter localização';
+    toast.error(message);
+    setLocation({ city: '', loading: false, error: true });
+  };
+  const updateLocationState = (city: string) => {
+    setLocation({ city, loading: false, error: false });
+    setLocationInput(city);
+    toast.success(city);
+  };
+  const handleGeocodeError = (error: string) => {
+    toast.error(error);
+    setLocation({ city: '', loading: false, error: true });
+  };
+  const processCoordinates = async (latitude: number, longitude: number) => {
+    try {
+      const result = await reverseGeocode(latitude, longitude);
+      if (result.error) {
+        handleGeocodeError(result.error);
+        return;
+      }
+      updateLocationState(result.city);
+    } catch {
+      handleGeocodeError('Erro ao processar localização');
+    }
+  };
+  const handleGeolocationSuccess = (position: GeolocationPosition) => {
+    const { latitude, longitude } = position.coords;
+    processCoordinates(latitude, longitude);
+  };
   const detectLocation = () => {
-    setLocation({ city: '', loading: true, error: false });
     if (!navigator.geolocation) {
+      toast.error('Geolocalização não suportada pelo navegador');
       setLocation({ city: '', loading: false, error: true });
       return;
     }
+    setLocation({ city: '', loading: true, error: false });
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          );
-          const data = await response.json();
-          const cityName =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            'Localização detectada';
-          setLocation({ city: cityName, loading: false, error: false });
-        } catch {
-          setLocation({
-            city: 'Localização detectada',
-            loading: false,
-            error: false
-          });
-        }
-      },
-      () => setLocation({ city: '', loading: false, error: true })
+      handleGeolocationSuccess,
+      handleGeolocationError,
+      {
+        timeout: GEOLOCATION_TIMEOUT,
+        enableHighAccuracy: false,
+        maximumAge: 300000
+      }
     );
+  };
+  const handleSearchEquipment = () => {
+    const params = new URLSearchParams();
+    if (searchTerm.trim()) params.set('search', searchTerm.trim());
+    const cityValue = locationInput || location.city;
+    if (cityValue.trim()) params.set('cidade', cityValue.trim());
+    router.push(`/equipamentos?${params.toString()}`);
   };
   return (
     <section className="relative overflow-hidden">
@@ -110,23 +145,34 @@ export const HeroSection = () => {
                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Ex: Escavadeira, Empilhadeira..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' && handleSearchEquipment()
+                  }
                   className="h-12 pl-10"
                 />
               </div>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder={location.city || 'Cidade ou Estado'}
-                  defaultValue={location.city}
+                  placeholder="Cidade ou Estado"
+                  value={locationInput || location.city}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' && handleSearchEquipment()
+                  }
                   className="h-12 pl-10"
                 />
               </div>
             </div>
-            <Button asChild className="h-12 w-full text-base" size="lg">
-              <Link href="/equipamentos">
-                <Search className="mr-2 h-5 w-5" />
-                Buscar Equipamentos
-              </Link>
+            <Button
+              onClick={handleSearchEquipment}
+              className="h-12 w-full text-base"
+              size="lg"
+            >
+              <Search className="mr-2 h-5 w-5" />
+              Buscar Equipamentos
             </Button>
           </div>
         </div>

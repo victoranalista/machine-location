@@ -105,18 +105,14 @@ const DesktopNav = () => (
         </NavigationMenuContent>
       </NavigationMenuItem>
       <NavigationMenuItem>
-        <Link href="/areas-atendimento" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            Cobertura
-          </NavigationMenuLink>
-        </Link>
+        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <Link href="/areas-atendimento">Cobertura</Link>
+        </NavigationMenuLink>
       </NavigationMenuItem>
       <NavigationMenuItem>
-        <Link href="/sobre" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            Sobre
-          </NavigationMenuLink>
-        </Link>
+        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <Link href="/sobre">Sobre</Link>
+        </NavigationMenuLink>
       </NavigationMenuItem>
     </NavigationMenuList>
   </NavigationMenu>
