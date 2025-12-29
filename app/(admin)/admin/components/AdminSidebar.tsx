@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -31,7 +30,6 @@ const navItems = [
 const AdminSidebar = () => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-
   return (
     <aside
       className={cn(
@@ -43,7 +41,7 @@ const AdminSidebar = () => {
         {!collapsed && (
           <Link href="/admin" className="flex items-center gap-2 font-bold">
             <HardHat className="h-6 w-6 text-primary" />
-            <span>EquipRent</span>
+            <span>MaquinaLoc</span>
           </Link>
         )}
         {collapsed && (
@@ -52,7 +50,6 @@ const AdminSidebar = () => {
           </Link>
         )}
       </div>
-
       <Button
         variant="ghost"
         size="icon"
@@ -66,7 +63,6 @@ const AdminSidebar = () => {
           )}
         />
       </Button>
-
       <ScrollArea className="flex-1 py-4">
         <nav className="space-y-1 px-2">
           {navItems.map((item) => {
@@ -92,7 +88,6 @@ const AdminSidebar = () => {
           })}
         </nav>
       </ScrollArea>
-
       <div className="border-t p-4">
         <Link
           href="/"
