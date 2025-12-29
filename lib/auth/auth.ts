@@ -10,6 +10,52 @@ const prisma = prismaNeon;
 type Role = 'ADMIN' | 'USER' | 'SUPPLIER';
 const VALID_ROLES: Role[] = ['ADMIN', 'USER', 'SUPPLIER'];
 
+type UserCredentials = {
+  email: string;
+  password: string;
+};
+
+type DbUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: Role;
+  password: string | null;
+};
+
+const validateCredentials = (
+  credentials: Record<string, unknown> | undefined
+): UserCredentials | null => {
+  if (!credentials?.email || !credentials?.password) return null;
+  return {
+    email: credentials.email.toString(),
+    password: credentials.password.toString()
+  };
+};
+
+const findActiveUser = async (email: string): Promise<DbUser | null> => {
+  return await prisma.user.findUnique({
+    where: { email, status: 'ACTIVE' },
+    select: { password: true, role: true, name: true, email: true, id: true }
+  });
+};
+
+const verifyUserPassword = async (
+  password: string,
+  hash: string
+): Promise<boolean> => {
+  return await bcrypt.compare(password, hash);
+};
+
+const createAuthUser = (dbUser: DbUser) => {
+  return {
+    id: dbUser.id,
+    name: dbUser.name || '',
+    email: dbUser.email,
+    role: dbUser.role
+  };
+};
+
 export const sessionMaxAge = 24 * 60 * 60;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -31,23 +77,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { type: 'password' }
       },
       authorize: async (credentials) => {
-        if (!credentials?.email || !credentials?.password) return null;
-        const email = credentials.email.toString();
-        const password = credentials.password.toString();
-        const dbUser = await prisma.userHistory.findFirst({
-          where: { email, status: 'ACTIVE' },
-          orderBy: { version: 'desc' },
-          select: { password: true, role: true, name: true, email: true }
-        });
+        const validatedCreds = validateCredentials(credentials);
+        if (!validatedCreds) return null;
+        const dbUser = await findActiveUser(validatedCreds.email);
         if (!dbUser?.password) return null;
-        const isValidPassword = await bcrypt.compare(password, dbUser.password);
-        if (!isValidPassword) return null;
-        return {
-          id: email,
-          name: dbUser.name,
-          email: dbUser.email,
-          role: dbUser.role
-        };
+        const isValid = await verifyUserPassword(
+          validatedCreds.password,
+          dbUser.password
+        );
+        if (!isValid) return null;
+        return createAuthUser(dbUser);
       }
     })
   ],
@@ -59,9 +98,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     jwt: async ({ token, user, trigger }) => {
       if (user) {
-        const dbUser = await prisma.userHistory.findFirst({
+        const dbUser = await prisma.user.findUnique({
           where: { email: user.email!, status: 'ACTIVE' },
-          orderBy: { version: 'desc' },
           select: { role: true, name: true }
         });
         token.name = dbUser?.name;
@@ -69,9 +107,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = dbUser?.role;
       }
       if (trigger === 'update' && token.email) {
-        const dbUser = await prisma.userHistory.findFirst({
+        const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string, status: 'ACTIVE' },
-          orderBy: { version: 'desc' },
           select: { role: true, name: true }
         });
         if (dbUser) {
@@ -132,9 +169,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 });
 
 const isAuthorizedEmail = async (email: string) => {
-  const dbUser = await prisma.userHistory.findFirst({
-    where: { email, status: 'ACTIVE' },
-    orderBy: { version: 'desc' }
+  const dbUser = await prisma.user.findUnique({
+    where: { email, status: 'ACTIVE' }
   });
   return !!dbUser;
 };
